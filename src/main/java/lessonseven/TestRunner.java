@@ -1,7 +1,13 @@
 package lessonseven;
 
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TestRunner {
 
@@ -41,6 +47,7 @@ public class TestRunner {
             if (countOfBeforeSuite > 1) {
                 throw new RuntimeException("Found more that one of @BeforeSuite annotation in the: " + obj.getName());
             }
+
         } else {
 
             Object instance = null;
@@ -51,6 +58,9 @@ public class TestRunner {
             } catch (InstantiationException e) {
                 e.printStackTrace();
             }
+
+
+
 
             //Run the @BeforeSuite methods
             for (Method m : methodsBeforeSuite) {
@@ -66,16 +76,21 @@ public class TestRunner {
             }
 
             //Run the @Test methods
+            //Sort and run
             Method[] methodsTest = obj.getMethods();
-            for (Method m : methodsTest) {
-                if (m.getAnnotation(Test.class) != null) {
-                    try {
-                        m.invoke(instance);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
+
+            List<Method> list = Arrays.stream(methodsTest)
+                    .filter(m -> m.getAnnotation(Test.class) != null)
+                    .sorted(Comparator.comparingInt(m -> m.getAnnotation(Test.class).value()))
+                    .collect(Collectors.toList());
+
+            for (Method m: list) {
+                try {
+                    m.invoke(instance);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
                 }
             }
 

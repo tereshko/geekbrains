@@ -7,7 +7,7 @@ public class TestTwo {
         System.out.println("BeforeSuite");
     }
 
-    @Test
+    @Test(1)
     public void test1() {
         System.out.println("test 2");
     }
